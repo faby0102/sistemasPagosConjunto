@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Pagos - Conjunto Habitacional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6 slide-in">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">💼 Sistema de Pagos</h1>
+                    <p class="text-gray-600 mt-1">Gestión de Copropietarios - Conjunto Habitacional</p>
+                    <div class="mt-2 text-sm text-green-600 font-semibold">🟢 Conectado a Base de Datos</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-gray-500">Total Copropietarios</div>
+                    <div class="text-3xl font-bold text-indigo-600" id="totalCopropietarios">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="bg-white rounded-2xl shadow-lg mb-6 slide-in" style="animation-delay: 0.1s;">
+            <div class="flex border-b">
+                <button id="tab-registro" class="flex-1 px-6 py-4 font-semibold text-indigo-600 border-b-2 border-indigo-600">
+                    📝 Registrar Pago
+                </button>
+                <button id="tab-copropietarios" class="flex-1 px-6 py-4 font-semibold text-gray-500 hover:text-gray-700">
+                    👥 Gestionar Copropietarios
+                </button>
+                <button id="tab-historial" class="flex-1 px-6 py-4 font-semibold text-gray-500 hover:text-gray-700">
+                    📊 Historial de Pagos
+                </button>
+                <button id="tab-resumen" class="flex-1 px-6 py-4 font-semibold text-gray-500 hover:text-gray-700">
+                    📈 Resumen General
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab: Registrar Pago -->
+        <div id="content-registro" class="space-y-6">
+            <div class="bg-white rounded-2xl shadow-lg p-6 slide-in" style="animation-delay: 0.2s;">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Registrar Nuevo Pago</h2>
+                <form id="formPago" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Departamento (búsqueda) -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Departamento *</label>
+                            <select id="selectDepartamento" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                <option value="">Seleccione un departamento</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Nombre Completo (no editable) -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre Completo</label>
+                            <input type="text" id="nombreCompleto" readonly class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed" placeholder="Se mostrará automáticamente">
+                        </div>
+                        
+                        <!-- Tipo de Pago -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Pago *</label>
+                            <select id="tipoPago" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                <option value="alicuota">Alícuota Mensual</option>
+                                <option value="agua">Consumo de Agua</option>
+                                <option value="extraordinaria">Cuota Extraordinaria</option>
+                                <option value="multa">Multa/Recargo</option>
+                                <option value="otro">Otro Concepto</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Monto -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Monto (USD) *</label>
+                            <input type="number" id="monto" step="0.01" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="0.00">
+                        </div>
+                        
+                        <!-- Fecha de Pago -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha de Pago *</label>
+                            <input type="date" id="fechaPago" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        </div>
+                        
+                        <!-- Entidad Bancaria -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Entidad Bancaria</label>
+                            <input type="text" id="entidadBancaria" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Ej: Banco Pichincha">
+                        </div>
+                        
+                        <!-- Número de Comprobante -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Número de Comprobante</label>
+                            <input type="text" id="numeroComprobante" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Ej: 123456789">
+                        </div>
+                        
+                        <!-- Periodo -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Periodo (Mes/Año) *</label>
+                            <input type="month" id="periodo" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        </div>
+                        
+                        <!-- Consumo de Agua (solo visible para tipo agua) -->
+                        <div id="consumoAguaField" class="hidden">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Consumo (m³)</label>
+                            <input type="number" id="consumoAgua" step="0.01" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="0.00">
+                        </div>
+                    </div>
+                    
+                    <!-- Observaciones -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Observaciones</label>
+                        <textarea id="observaciones" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Detalles adicionales..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg hover:shadow-xl">
+                        💾 Registrar Pago
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab: Gestionar Copropietarios -->
+        <div id="content-copropietarios" class="space-y-6 hidden">
+            <div class="bg-white rounded-2xl shadow-lg p-6 slide-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Agregar Copropietario</h2>
+                <form id="formCopropietario" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nombres *</label>
+                            <input type="text" id="nombres" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Juan Carlos">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Apellidos *</label>
+                            <input type="text" id="apellidos" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Pérez García">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Cédula *</label>
+                            <input type="text" id="cedula" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="1234567890">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Departamento *</label>
+                            <input type="text" id="departamento" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="101">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Bloque *</label>
+                            <input type="text" id="bloque" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="A">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono</label>
+                            <input type="tel" id="telefono" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="+593 99 999 9999">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                            <input type="email" id="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="correo@ejemplo.com">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg hover:shadow-xl">
+                        ➕ Agregar Copropietario
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Lista de Copropietarios</h2>
+                    <div class="text-sm text-gray-500">
+                        Total: <span id="totalCopropTabla" class="font-bold text-indigo-600">0</span>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <input type="text" id="buscarCoprop" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="🔍 Buscar por nombre, cédula o departamento...">
+                </div>
+                <div id="listaCopropietarios" class="overflow-x-auto"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Historial de Pagos -->
+        <div id="content-historial" class="space-y-6 hidden">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Historial de Pagos</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Filtrar por Copropietario</label>
+                        <select id="filtroHistorialCoprop" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Filtrar por Tipo</label>
+                        <select id="filtroHistorialTipo" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                            <option value="">Todos</option>
+                            <option value="alicuota">Alícuota Mensual</option>
+                            <option value="agua">Consumo de Agua</option>
+                            <option value="extraordinaria">Cuota Extraordinaria</option>
+                            <option value="multa">Multa/Recargo</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Periodo</label>
+                        <input type="month" id="filtroPeriodo" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                    </div>
+                </div>
+                <div id="tablaHistorial" class="overflow-x-auto"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Resumen General -->
+        <div id="content-resumen" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg p-6 text-white">
+                    <div class="text-sm opacity-90">Total Recaudado</div>
+                    <div class="text-3xl font-bold mt-2" id="totalRecaudado">$0.00</div>
+                </div>
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white">
+                    <div class="text-sm opacity-90">Pagos Este Mes</div>
+                    <div class="text-3xl font-bold mt-2" id="pagosEsteMes">0</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
+                    <div class="text-sm opacity-90">Promedio por Pago</div>
+                    <div class="text-3xl font-bold mt-2" id="promedioPago">$0.00</div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Estado de Cuenta por Copropietario</h2>
+                <div id="resumenCopropietarios"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Esperar a que el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', function() {
+        
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://nofvsxiojrguldqieohk.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5vZnZzeGlvanJndWxkcWllb2hrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMTE2MzMsImV4cCI6MjA4NjU4NzYzM30.yrd406gkL0u-KXnhEs4Iaiep22Np0uBC2z5IpFmrJSA';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Variables globales
+        let copropietarios = [];
+        let pagos = [];
+
+        // Cargar datos desde Supabase
+        async function loadData() {
+            try {
+                // Cargar copropietarios
+                const { data: copropData, error: copropError } = await supabase
+                    .from('copropietarios')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (copropError) throw copropError;
+                copropietarios = copropData || [];
+
+                // Cargar pagos
+                const { data: pagosData, error: pagosError } = await supabase
+                    .from('pagos')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (pagosError) throw pagosError;
+                pagos = pagosData || [];
+
+                updateUI();
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                alert('Error al cargar datos: ' + error.message);
+            }
+        }
+
+        // Tab management
+        function showTab(tabName) {
+            ['registro', 'copropietarios', 'historial', 'resumen'].forEach(tab => {
+                document.getElementById(`content-${tab}`).classList.add('hidden');
+                document.getElementById(`tab-${tab}`).classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600');
+                document.getElementById(`tab-${tab}`).classList.add('text-gray-500');
+            });
+            
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600');
+            document.getElementById(`tab-${tabName}`).classList.remove('text-gray-500');
+            
+            if (tabName === 'historial') renderHistorial();
+            if (tabName === 'resumen') renderResumen();
+        }
+
+        // Copropietario form
+        document.getElementById('formCopropietario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const nuevoCoprop = {
+                nombres: document.getElementById('nombres').value,
+                apellidos: document.getElementById('apellidos').value,
+                cedula: document.getElementById('cedula').value,
+                departamento: document.getElementById('departamento').value,
+                bloque: document.getElementById('bloque').value,
+                telefono: document.getElementById('telefono').value || null,
+                email: document.getElementById('email').value || null
+            };
+            
+            try {
+                const { data, error } = await supabase
+                    .from('copropietarios')
+                    .insert([nuevoCoprop])
+                    .select();
+                
+                if (error) throw error;
+                
+                e.target.reset();
+                await loadData();
+                alert('✅ Copropietario agregado exitosamente');
+            } catch (error) {
+                console.error('Error:', error);
+                if (error.code === '23505') {
+                    alert('❌ Esta cédula ya está registrada');
+                } else {
+                    alert('❌ Error al agregar copropietario: ' + error.message);
+                }
+            }
+        });
+
+        // Pago form
+        document.getElementById('formPago').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const copropietarioId = document.getElementById('selectDepartamento').value;
+            if (!copropietarioId) {
+                alert('❌ Por favor seleccione un departamento');
+                return;
+            }
+            
+            const nuevoPago = {
+                copropietario_id: copropietarioId,
+                tipo: document.getElementById('tipoPago').value,
+                monto: parseFloat(document.getElementById('monto').value),
+                fecha: document.getElementById('fechaPago').value,
+                entidad_bancaria: document.getElementById('entidadBancaria').value || null,
+                numero_comprobante: document.getElementById('numeroComprobante').value || null,
+                periodo: document.getElementById('periodo').value,
+                observaciones: document.getElementById('observaciones').value || null,
+                consumo_agua: document.getElementById('consumoAgua').value ? 
+                    parseFloat(document.getElementById('consumoAgua').value) : null
+            };
+            
+            try {
+                const { data, error } = await supabase
+                    .from('pagos')
+                    .insert([nuevoPago])
+                    .select();
+                
+                if (error) throw error;
+                
+                e.target.reset();
+                document.getElementById('nombreCompleto').value = '';
+                document.getElementById('consumoAguaField').classList.add('hidden');
+                await loadData();
+                alert('✅ Pago registrado exitosamente');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al registrar pago: ' + error.message);
+            }
+        });
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('totalCopropietarios').textContent = copropietarios.length;
+            
+            // Update department select (sorted by block and department)
+            const selectDepto = document.getElementById('selectDepartamento');
+            const selectHistorial = document.getElementById('filtroHistorialCoprop');
+            
+            selectDepto.innerHTML = '<option value="">Seleccione un departamento</option>';
+            selectHistorial.innerHTML = '<option value="">Todos</option>';
+            
+            // Sort copropietarios by block and department
+            const sorted = [...copropietarios].sort((a, b) => {
+                if (a.bloque !== b.bloque) return a.bloque.localeCompare(b.bloque);
+                return a.departamento.localeCompare(b.departamento);
+            });
+            
+            sorted.forEach(c => {
+                const displayDepto = `Bloque ${c.bloque} - Depto ${c.departamento}`;
+                const displayHistorial = `${c.nombres} ${c.apellidos} - Bloque ${c.bloque} Depto ${c.departamento}`;
+                selectDepto.innerHTML += `<option value="${c.id}">${displayDepto}</option>`;
+                selectHistorial.innerHTML += `<option value="${c.id}">${displayHistorial}</option>`;
+            });
+            
+            renderCopropietarios();
+        }
+        
+        // Auto-fill name when department is selected
+        document.getElementById('selectDepartamento').addEventListener('change', function() {
+            const copropId = this.value;
+            const nombreField = document.getElementById('nombreCompleto');
+            
+            if (copropId) {
+                const coprop = copropietarios.find(c => c.id === copropId);
+                if (coprop) {
+                    nombreField.value = `${coprop.nombres} ${coprop.apellidos}`;
+                }
+            } else {
+                nombreField.value = '';
+            }
+        });
+
+        function renderCopropietarios() {
+            const lista = document.getElementById('listaCopropietarios');
+            const busqueda = document.getElementById('buscarCoprop').value.toLowerCase();
+            
+            const filtrados = copropietarios.filter(c => 
+                c.nombres.toLowerCase().includes(busqueda) || 
+                c.apellidos.toLowerCase().includes(busqueda) ||
+                c.cedula.includes(busqueda) ||
+                c.departamento.toLowerCase().includes(busqueda) ||
+                c.bloque.toLowerCase().includes(busqueda)
+            );
+            
+            document.getElementById('totalCopropTabla').textContent = filtrados.length;
+            
+            if (filtrados.length === 0) {
+                lista.innerHTML = '<div class="text-center text-gray-500 py-8">No hay copropietarios registrados</div>';
+                return;
+            }
+            
+            // Calculate statistics for each copropietario
+            const copropietariosConStats = filtrados.map(c => {
+                const pagosCoprop = pagos.filter(p => p.copropietario_id === c.id);
+                const totalPagado = pagosCoprop.reduce((sum, p) => sum + parseFloat(p.monto), 0);
+                const ultimoPago = pagosCoprop.length > 0 ? 
+                    new Date(Math.max(...pagosCoprop.map(p => new Date(p.fecha)))) : null;
+                const totalConsumoAgua = pagosCoprop
+                    .filter(p => p.tipo === 'agua' && p.consumo_agua)
+                    .reduce((sum, p) => sum + parseFloat(p.consumo_agua), 0);
+                
+                return {
+                    ...c,
+                    cantidadPagos: pagosCoprop.length,
+                    totalPagado,
+                    ultimoPago,
+                    totalConsumoAgua
+                };
+            });
+            
+            lista.innerHTML = `
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Nombres</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Apellidos</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Cédula</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Bloque</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Depto</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Contacto</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Total Pagado</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Consumo Agua</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Último Pago</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700"># Pagos</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        ${copropietariosConStats.map(c => `
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-4 py-3">
+                                    <div class="font-semibold text-gray-800">${c.nombres}</div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="font-semibold text-gray-800">${c.apellidos}</div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="text-sm text-gray-600">${c.cedula}</div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="font-bold text-indigo-600">${c.bloque}</div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="font-bold text-indigo-600">${c.departamento}</div>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    ${c.telefono ? `<div class="text-gray-600">📱 ${c.telefono}</div>` : ''}
+                                    ${c.email ? `<div class="text-gray-600 text-xs">📧 ${c.email}</div>` : ''}
+                                    ${!c.telefono && !c.email ? '<span class="text-gray-400">-</span>' : ''}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="font-bold text-green-600">$${c.totalPagado.toFixed(2)}</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="text-blue-600 font-semibold">${c.totalConsumoAgua > 0 ? `💧 ${c.totalConsumoAgua.toFixed(2)} m³` : '-'}</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    ${c.ultimoPago ? `
+                                        <span class="text-gray-600">${c.ultimoPago.toLocaleDateString('es-EC')}</span>
+                                    ` : '<span class="text-gray-400">Sin pagos</span>'}
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                        ${c.cantidadPagos}
+                                    </span>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function renderHistorial() {
+            let pagosFiltrados = [...pagos];
+            
+            const copropId = document.getElementById('filtroHistorialCoprop').value;
+            const tipo = document.getElementById('filtroHistorialTipo').value;
+            const periodo = document.getElementById('filtroPeriodo').value;
+            
+            if (copropId) pagosFiltrados = pagosFiltrados.filter(p => p.copropietario_id === copropId);
+            if (tipo) pagosFiltrados = pagosFiltrados.filter(p => p.tipo === tipo);
+            if (periodo) pagosFiltrados = pagosFiltrados.filter(p => p.periodo === periodo);
+            
+            pagosFiltrados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            
+            const tabla = document.getElementById('tablaHistorial');
+            
+            if (pagosFiltrados.length === 0) {
+                tabla.innerHTML = '<div class="text-center text-gray-500 py-8">No hay pagos registrados</div>';
+                return;
+            }
+            
+            tabla.innerHTML = `
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Fecha</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Copropietario</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Tipo</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Monto</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Consumo</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Entidad</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Comprobante</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Periodo</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        ${pagosFiltrados.map(p => {
+                            const coprop = copropietarios.find(c => c.id === p.copropietario_id);
+                            const tipoLabels = {
+                                alicuota: 'Alícuota',
+                                agua: 'Consumo Agua',
+                                extraordinaria: 'Extraordinaria',
+                                multa: 'Multa',
+                                otro: 'Otro'
+                            };
+                            return `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3 text-sm">${new Date(p.fecha).toLocaleDateString('es-EC')}</td>
+                                    <td class="px-4 py-3 text-sm font-medium">${coprop ? `${coprop.nombres} ${coprop.apellidos} (${coprop.bloque}-${coprop.departamento})` : 'N/A'}</td>
+                                    <td class="px-4 py-3 text-sm">${tipoLabels[p.tipo]}</td>
+                                    <td class="px-4 py-3 text-sm font-bold text-green-600">$${parseFloat(p.monto).toFixed(2)}</td>
+                                    <td class="px-4 py-3 text-sm">${p.consumo_agua ? `💧 ${p.consumo_agua} m³` : '-'}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">${p.entidad_bancaria || '-'}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">${p.numero_comprobante || '-'}</td>
+                                    <td class="px-4 py-3 text-sm">${p.periodo ? new Date(p.periodo + '-01').toLocaleDateString('es-EC', {month: 'short', year: 'numeric'}) : 'N/A'}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function renderResumen() {
+            const totalRecaudado = pagos.reduce((sum, p) => sum + parseFloat(p.monto), 0);
+            const mesActual = new Date().toISOString().slice(0, 7);
+            const pagosEsteMes = pagos.filter(p => p.fecha.startsWith(mesActual)).length;
+            const promedio = pagos.length > 0 ? totalRecaudado / pagos.length : 0;
+            
+            document.getElementById('totalRecaudado').textContent = `$${totalRecaudado.toFixed(2)}`;
+            document.getElementById('pagosEsteMes').textContent = pagosEsteMes;
+            document.getElementById('promedioPago').textContent = `$${promedio.toFixed(2)}`;
+            
+            const resumen = document.getElementById('resumenCopropietarios');
+            resumen.innerHTML = copropietarios.map(c => {
+                const pagosCoprop = pagos.filter(p => p.copropietario_id === c.id);
+                const totalPagado = pagosCoprop.reduce((sum, p) => sum + parseFloat(p.monto), 0);
+                const ultimoPago = pagosCoprop.length > 0 ? 
+                    new Date(Math.max(...pagosCoprop.map(p => new Date(p.fecha)))).toLocaleDateString('es-EC') : 
+                    'Sin pagos';
+                
+                return `
+                    <div class="border border-gray-200 rounded-lg p-4 mb-4 hover:shadow-md transition">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-lg">${c.nombres} ${c.apellidos}</div>
+                                <div class="text-sm text-gray-600">🏠 Bloque ${c.bloque} - Depto ${c.departamento}</div>
+                                <div class="text-sm text-gray-500 mt-1">Último pago: ${ultimoPago}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-500">Total Pagado</div>
+                                <div class="text-2xl font-bold text-green-600">$${totalPagado.toFixed(2)}</div>
+                                <div class="text-xs text-gray-500 mt-1">${pagosCoprop.length} pagos</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Event listeners
+        document.getElementById('buscarCoprop').addEventListener('input', renderCopropietarios);
+        document.getElementById('filtroHistorialCoprop').addEventListener('change', renderHistorial);
+        document.getElementById('filtroHistorialTipo').addEventListener('change', renderHistorial);
+        document.getElementById('filtroPeriodo').addEventListener('change', renderHistorial);
+
+        // Tab button event listeners
+        document.getElementById('tab-registro').addEventListener('click', () => showTab('registro'));
+        document.getElementById('tab-copropietarios').addEventListener('click', () => showTab('copropietarios'));
+        document.getElementById('tab-historial').addEventListener('click', () => showTab('historial'));
+        document.getElementById('tab-resumen').addEventListener('click', () => showTab('resumen'));
+
+        // Show/hide water consumption field
+        document.getElementById('tipoPago').addEventListener('change', function() {
+            const consumoField = document.getElementById('consumoAguaField');
+            if (this.value === 'agua') {
+                consumoField.classList.remove('hidden');
+            } else {
+                consumoField.classList.add('hidden');
+                document.getElementById('consumoAgua').value = '';
+            }
+        });
+
+        // Set default date
+        document.getElementById('fechaPago').valueAsDate = new Date();
+
+        // Load data on start
+        loadData();
+        
+        }); // End DOMContentLoaded
+    </script>
+</body>
+</html>
