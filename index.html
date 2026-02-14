@@ -33,46 +33,47 @@
 
         <!-- Tabs Navigation -->
         <div class="bg-white rounded-2xl shadow-lg mb-6 slide-in" style="animation-delay: 0.1s;">
-            <div class="flex border-b">
-                <button id="tab-registro" class="flex-1 px-6 py-4 font-semibold text-indigo-600 border-b-2 border-indigo-600">
+            <div class="flex flex-wrap border-b">
+                <button id="tab-registro" class="flex-1 px-4 py-4 font-semibold text-indigo-600 border-b-2 border-indigo-600 min-w-[120px]">
                     📝 Registrar Pago
                 </button>
-                <button id="tab-copropietarios" class="flex-1 px-6 py-4 font-semibold text-gray-500 hover:text-gray-700">
-                    👥 Gestionar Copropietarios
+                <button id="tab-copropietarios" class="flex-1 px-4 py-4 font-semibold text-gray-500 hover:text-gray-700 min-w-[120px]">
+                    👥 Copropietarios
                 </button>
-                <button id="tab-historial" class="flex-1 px-6 py-4 font-semibold text-gray-500 hover:text-gray-700">
-                    📊 Historial de Pagos
+                <button id="tab-gestion" class="flex-1 px-4 py-4 font-semibold text-gray-500 hover:text-gray-700 min-w-[120px]">
+                    🔧 Gestión Mensual
                 </button>
-                <button id="tab-resumen" class="flex-1 px-6 py-4 font-semibold text-gray-500 hover:text-gray-700">
-                    📈 Resumen General
+                <button id="tab-deudores" class="flex-1 px-4 py-4 font-semibold text-gray-500 hover:text-gray-700 min-w-[120px]">
+                    ⚠️ Deudores
+                </button>
+                <button id="tab-historial" class="flex-1 px-4 py-4 font-semibold text-gray-500 hover:text-gray-700 min-w-[120px]">
+                    📊 Historial
+                </button>
+                <button id="tab-resumen" class="flex-1 px-4 py-4 font-semibold text-gray-500 hover:text-gray-700 min-w-[120px]">
+                    📈 Resumen
                 </button>
             </div>
         </div>
 
         <!-- Tab: Registrar Pago -->
         <div id="content-registro" class="space-y-6">
-            <div class="bg-white rounded-2xl shadow-lg p-6 slide-in" style="animation-delay: 0.2s;">
+            <div class="bg-white rounded-2xl shadow-lg p-6 slide-in">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Registrar Nuevo Pago</h2>
                 <form id="formPago" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Departamento (búsqueda) -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Departamento *</label>
-                            <select id="selectDepartamento" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <select id="selectDepartamento" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                                 <option value="">Seleccione un departamento</option>
                             </select>
                         </div>
-                        
-                        <!-- Nombre Completo (no editable) -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre Completo</label>
-                            <input type="text" id="nombreCompleto" readonly class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed" placeholder="Se mostrará automáticamente">
+                            <input type="text" id="nombreCompleto" readonly class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed">
                         </div>
-                        
-                        <!-- Tipo de Pago -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Pago *</label>
-                            <select id="tipoPago" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <select id="tipoPago" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                                 <option value="alicuota">Alícuota Mensual</option>
                                 <option value="agua">Consumo de Agua</option>
                                 <option value="extraordinaria">Cuota Extraordinaria</option>
@@ -80,50 +81,35 @@
                                 <option value="otro">Otro Concepto</option>
                             </select>
                         </div>
-                        
-                        <!-- Monto -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Monto (USD) *</label>
-                            <input type="number" id="monto" step="0.01" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="0.00">
+                            <input type="number" id="monto" step="0.01" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="0.00">
                         </div>
-                        
-                        <!-- Fecha de Pago -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Fecha de Pago *</label>
-                            <input type="date" id="fechaPago" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <input type="date" id="fechaPago" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                         </div>
-                        
-                        <!-- Entidad Bancaria -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Entidad Bancaria</label>
-                            <input type="text" id="entidadBancaria" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Ej: Banco Pichincha">
+                            <input type="text" id="entidadBancaria" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Ej: Banco Pichincha">
                         </div>
-                        
-                        <!-- Número de Comprobante -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Número de Comprobante</label>
-                            <input type="text" id="numeroComprobante" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Ej: 123456789">
+                            <input type="text" id="numeroComprobante" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Ej: 123456789">
                         </div>
-                        
-                        <!-- Periodo -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Periodo (Mes/Año) *</label>
-                            <input type="month" id="periodo" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <input type="month" id="periodo" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                         </div>
-                        
-                        <!-- Consumo de Agua (solo visible para tipo agua) -->
                         <div id="consumoAguaField" class="hidden">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Consumo (m³)</label>
-                            <input type="number" id="consumoAgua" step="0.01" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="0.00">
+                            <input type="number" id="consumoAgua" step="0.01" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="0.00">
                         </div>
                     </div>
-                    
-                    <!-- Observaciones -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Observaciones</label>
-                        <textarea id="observaciones" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Detalles adicionales..."></textarea>
+                        <textarea id="observaciones" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Detalles adicionales..."></textarea>
                     </div>
-                    
                     <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg hover:shadow-xl">
                         💾 Registrar Pago
                     </button>
@@ -139,31 +125,31 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Nombres *</label>
-                            <input type="text" id="nombres" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Juan Carlos">
+                            <input type="text" id="nombres" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Juan Carlos">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Apellidos *</label>
-                            <input type="text" id="apellidos" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Pérez García">
+                            <input type="text" id="apellidos" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Pérez García">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Cédula *</label>
-                            <input type="text" id="cedula" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="1234567890">
+                            <input type="text" id="cedula" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="1234567890">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Departamento *</label>
-                            <input type="text" id="departamento" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="101">
+                            <input type="text" id="departamento" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="101">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Bloque *</label>
-                            <input type="text" id="bloque" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="A">
+                            <input type="text" id="bloque" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="A">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Teléfono</label>
-                            <input type="tel" id="telefono" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="+593 99 999 9999">
+                            <input type="tel" id="telefono" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="+593 99 999 9999">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-                            <input type="email" id="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="correo@ejemplo.com">
+                            <input type="email" id="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="correo@ejemplo.com">
                         </div>
                     </div>
                     <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg hover:shadow-xl">
@@ -183,6 +169,76 @@
                     <input type="text" id="buscarCoprop" class="w-full px-4 py-3 border border-gray-300 rounded-lg" placeholder="🔍 Buscar por nombre, cédula o departamento...">
                 </div>
                 <div id="listaCopropietarios" class="overflow-x-auto"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Gestión Mensual -->
+        <div id="content-gestion" class="space-y-6 hidden">
+            <!-- Generar Expensas -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">🔄 Generar Expensas Mensuales</h2>
+                <p class="text-gray-600 mb-6">Genera automáticamente un cargo de $22.00 por alícuota para todos los copropietarios del mes seleccionado.</p>
+                <div class="flex gap-4 items-end">
+                    <div class="flex-1">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Periodo (Mes/Año)</label>
+                        <input type="month" id="periodoExpensas" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <button onclick="generarExpensas()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-200 shadow-lg hover:shadow-xl">
+                        🚀 Generar Expensas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Registrar Consumo de Agua Masivo -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">💧 Registrar Consumo de Agua del Mes</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Periodo (Mes/Año)</label>
+                        <input type="month" id="periodoAgua" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Precio por m³ (USD)</label>
+                        <input type="number" id="precioM3" step="0.01" value="0.50" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="0.50">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="cargarTablaAgua()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition">
+                            📋 Cargar Tabla
+                        </button>
+                    </div>
+                </div>
+                <div id="tablaAgua" class="overflow-x-auto"></div>
+                <div id="botonGuardarAgua" class="hidden mt-4">
+                    <button onclick="guardarConsumoAgua()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition shadow-lg hover:shadow-xl">
+                        💾 Guardar Todos los Consumos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Deudores -->
+        <div id="content-deudores" class="space-y-6 hidden">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">⚠️ Reporte de Deudores</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Filtrar por Bloque</label>
+                        <select id="filtroDeudoresBloque" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Filtrar por Periodo</label>
+                        <input type="month" id="filtroDeudoresPeriodo" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="renderDeudores()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition">
+                            🔍 Buscar Deudores
+                        </button>
+                    </div>
+                </div>
+                <div id="resumenDeudas" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"></div>
+                <div id="tablaDeudores" class="overflow-x-auto"></div>
             </div>
         </div>
 
@@ -228,9 +284,9 @@
                     <div class="text-sm opacity-90">Pagos Este Mes</div>
                     <div class="text-3xl font-bold mt-2" id="pagosEsteMes">0</div>
                 </div>
-                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white">
-                    <div class="text-sm opacity-90">Promedio por Pago</div>
-                    <div class="text-3xl font-bold mt-2" id="promedioPago">$0.00</div>
+                <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-lg p-6 text-white">
+                    <div class="text-sm opacity-90">Deuda Total Pendiente</div>
+                    <div class="text-3xl font-bold mt-2" id="deudaTotal">$0.00</div>
                 </div>
             </div>
 
@@ -242,7 +298,6 @@
     </div>
 
     <script>
-        // Esperar a que el DOM esté completamente cargado
         document.addEventListener('DOMContentLoaded', function() {
         
         // Configuración de Supabase
@@ -254,11 +309,11 @@
         // Variables globales
         let copropietarios = [];
         let pagos = [];
+        let expensas = [];
 
         // Cargar datos desde Supabase
         async function loadData() {
             try {
-                // Cargar copropietarios
                 const { data: copropData, error: copropError } = await supabase
                     .from('copropietarios')
                     .select('*')
@@ -267,7 +322,6 @@
                 if (copropError) throw copropError;
                 copropietarios = copropData || [];
 
-                // Cargar pagos
                 const { data: pagosData, error: pagosError } = await supabase
                     .from('pagos')
                     .select('*')
@@ -275,6 +329,14 @@
                 
                 if (pagosError) throw pagosError;
                 pagos = pagosData || [];
+
+                const { data: expensasData, error: expensasError } = await supabase
+                    .from('expensas_mensuales')
+                    .select('*')
+                    .order('periodo', { ascending: false });
+                
+                if (expensasError) throw expensasError;
+                expensas = expensasData || [];
 
                 updateUI();
             } catch (error) {
@@ -284,19 +346,28 @@
         }
 
         // Tab management
-        function showTab(tabName) {
-            ['registro', 'copropietarios', 'historial', 'resumen'].forEach(tab => {
-                document.getElementById(`content-${tab}`).classList.add('hidden');
-                document.getElementById(`tab-${tab}`).classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600');
-                document.getElementById(`tab-${tab}`).classList.add('text-gray-500');
+        window.showTab = function(tabName) {
+            ['registro', 'copropietarios', 'gestion', 'deudores', 'historial', 'resumen'].forEach(tab => {
+                const content = document.getElementById(`content-${tab}`);
+                const tabBtn = document.getElementById(`tab-${tab}`);
+                if (content && tabBtn) {
+                    content.classList.add('hidden');
+                    tabBtn.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600');
+                    tabBtn.classList.add('text-gray-500');
+                }
             });
             
-            document.getElementById(`content-${tabName}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabName}`).classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600');
-            document.getElementById(`tab-${tabName}`).classList.remove('text-gray-500');
+            const activeContent = document.getElementById(`content-${tabName}`);
+            const activeTab = document.getElementById(`tab-${tabName}`);
+            if (activeContent && activeTab) {
+                activeContent.classList.remove('hidden');
+                activeTab.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600');
+                activeTab.classList.remove('text-gray-500');
+            }
             
             if (tabName === 'historial') renderHistorial();
             if (tabName === 'resumen') renderResumen();
+            if (tabName === 'deudores') renderDeudores();
         }
 
         // Copropietario form
@@ -365,6 +436,11 @@
                 
                 if (error) throw error;
                 
+                // Marcar expensa como pagada si aplica
+                if (nuevoPago.tipo === 'alicuota' || nuevoPago.tipo === 'agua') {
+                    await marcarExpensaPagada(copropietarioId, nuevoPago.periodo);
+                }
+                
                 e.target.reset();
                 document.getElementById('nombreCompleto').value = '';
                 document.getElementById('consumoAguaField').classList.add('hidden');
@@ -376,18 +452,262 @@
             }
         });
 
+        // Marcar expensa como pagada
+        async function marcarExpensaPagada(copropietarioId, periodo) {
+            try {
+                const { error } = await supabase
+                    .from('expensas_mensuales')
+                    .update({ pagado: true, fecha_pago: new Date().toISOString() })
+                    .eq('copropietario_id', copropietarioId)
+                    .eq('periodo', periodo);
+                
+                if (error) console.error('Error marcando expensa:', error);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Generar expensas mensuales
+        window.generarExpensas = async function() {
+            const periodo = document.getElementById('periodoExpensas').value;
+            if (!periodo) {
+                alert('❌ Por favor seleccione un periodo');
+                return;
+            }
+
+            if (!confirm(`¿Generar expensas de $22 para todos los copropietarios del periodo ${periodo}?`)) {
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase.rpc('generar_expensas_mes', {
+                    periodo_input: periodo
+                });
+
+                if (error) throw error;
+
+                await loadData();
+                alert(`✅ Se generaron ${data} expensas exitosamente`);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al generar expensas: ' + error.message);
+            }
+        }
+
+        // Cargar tabla de agua
+        window.cargarTablaAgua = function() {
+            const periodo = document.getElementById('periodoAgua').value;
+            const precioM3 = parseFloat(document.getElementById('precioM3').value);
+
+            if (!periodo || !precioM3) {
+                alert('❌ Complete el periodo y precio por m³');
+                return;
+            }
+
+            const sorted = [...copropietarios].sort((a, b) => {
+                if (a.bloque !== b.bloque) return a.bloque.localeCompare(b.bloque);
+                return a.departamento.localeCompare(b.departamento);
+            });
+
+            const tabla = document.getElementById('tablaAgua');
+            tabla.innerHTML = `
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-sm font-semibold">Bloque</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold">Depto</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold">Copropietario</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold">Consumo (m³)</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold">Monto (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        ${sorted.map(c => `
+                            <tr data-coprop-id="${c.id}">
+                                <td class="px-4 py-3 font-bold text-indigo-600">${c.bloque}</td>
+                                <td class="px-4 py-3 font-bold text-indigo-600">${c.departamento}</td>
+                                <td class="px-4 py-3">${c.nombres} ${c.apellidos}</td>
+                                <td class="px-4 py-3">
+                                    <input type="number" step="0.01" class="consumo-input w-24 px-2 py-1 border rounded" 
+                                           data-coprop-id="${c.id}" onchange="calcularMontoAgua(this, ${precioM3})">
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="monto-display font-bold text-green-600">$0.00</span>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('botonGuardarAgua').classList.remove('hidden');
+        }
+
+        window.calcularMontoAgua = function(input, precioM3) {
+            const row = input.closest('tr');
+            const consumo = parseFloat(input.value) || 0;
+            const monto = consumo * precioM3;
+            row.querySelector('.monto-display').textContent = `$${monto.toFixed(2)}`;
+        }
+
+        window.guardarConsumoAgua = async function() {
+            const periodo = document.getElementById('periodoAgua').value;
+            const precioM3 = parseFloat(document.getElementById('precioM3').value);
+            
+            const inputs = document.querySelectorAll('.consumo-input');
+            const registros = [];
+
+            inputs.forEach(input => {
+                const consumo = parseFloat(input.value) || 0;
+                if (consumo > 0) {
+                    const copropId = input.dataset.copropId;
+                    const monto = consumo * precioM3;
+                    registros.push({
+                        copropietario_id: copropId,
+                        consumo_m3: consumo,
+                        monto: monto
+                    });
+                }
+            });
+
+            if (registros.length === 0) {
+                alert('❌ No hay consumos registrados');
+                return;
+            }
+
+            if (!confirm(`¿Guardar ${registros.length} consumos de agua?`)) {
+                return;
+            }
+
+            try {
+                // Actualizar expensas existentes
+                for (const reg of registros) {
+                    const { error } = await supabase
+                        .from('expensas_mensuales')
+                        .update({
+                            consumo_agua_m3: reg.consumo_m3,
+                            monto_agua: reg.monto,
+                            total: supabase.sql`monto_alicuota + ${reg.monto}`
+                        })
+                        .eq('copropietario_id', reg.copropietario_id)
+                        .eq('periodo', periodo);
+
+                    if (error) throw error;
+                }
+
+                await loadData();
+                alert(`✅ Se guardaron ${registros.length} consumos de agua`);
+                document.getElementById('tablaAgua').innerHTML = '';
+                document.getElementById('botonGuardarAgua').classList.add('hidden');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al guardar consumos: ' + error.message);
+            }
+        }
+
+        // Renderizar deudores
+        window.renderDeudores = async function() {
+            const bloque = document.getElementById('filtroDeudoresBloque').value;
+            const periodo = document.getElementById('filtroDeudoresPeriodo').value;
+
+            try {
+                let query = supabase
+                    .from('expensas_mensuales')
+                    .select(`
+                        *,
+                        copropietarios (*)
+                    `)
+                    .eq('pagado', false);
+
+                if (periodo) query = query.eq('periodo', periodo);
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                let deudores = data || [];
+                
+                if (bloque) {
+                    deudores = deudores.filter(d => d.copropietarios.bloque === bloque);
+                }
+
+                // Calcular resumen
+                const totalDeuda = deudores.reduce((sum, d) => sum + parseFloat(d.total), 0);
+                const totalDeudores = new Set(deudores.map(d => d.copropietario_id)).size;
+
+                document.getElementById('resumenDeudas').innerHTML = `
+                    <div class="bg-red-100 rounded-lg p-4">
+                        <div class="text-sm text-red-600">Total Deudores</div>
+                        <div class="text-2xl font-bold text-red-700">${totalDeudores}</div>
+                    </div>
+                    <div class="bg-orange-100 rounded-lg p-4">
+                        <div class="text-sm text-orange-600">Expensas Vencidas</div>
+                        <div class="text-2xl font-bold text-orange-700">${deudores.length}</div>
+                    </div>
+                    <div class="bg-yellow-100 rounded-lg p-4">
+                        <div class="text-sm text-yellow-600">Deuda Total</div>
+                        <div class="text-2xl font-bold text-yellow-700">$${totalDeuda.toFixed(2)}</div>
+                    </div>
+                `;
+
+                const tabla = document.getElementById('tablaDeudores');
+                if (deudores.length === 0) {
+                    tabla.innerHTML = '<div class="text-center text-gray-500 py-8">✅ No hay deudores</div>';
+                    return;
+                }
+
+                tabla.innerHTML = `
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Bloque</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Depto</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Copropietario</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Periodo</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Alícuota</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Agua</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Total Deuda</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Contacto</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            ${deudores.map(d => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3 font-bold text-indigo-600">${d.copropietarios.bloque}</td>
+                                    <td class="px-4 py-3 font-bold text-indigo-600">${d.copropietarios.departamento}</td>
+                                    <td class="px-4 py-3">${d.copropietarios.nombres} ${d.copropietarios.apellidos}</td>
+                                    <td class="px-4 py-3">${new Date(d.periodo + '-01').toLocaleDateString('es-EC', {month: 'short', year: 'numeric'})}</td>
+                                    <td class="px-4 py-3">$${parseFloat(d.monto_alicuota).toFixed(2)}</td>
+                                    <td class="px-4 py-3">${d.monto_agua ? `$${parseFloat(d.monto_agua).toFixed(2)}` : '-'}</td>
+                                    <td class="px-4 py-3 font-bold text-red-600">$${parseFloat(d.total).toFixed(2)}</td>
+                                    <td class="px-4 py-3 text-sm">
+                                        ${d.copropietarios.telefono ? `📱 ${d.copropietarios.telefono}` : '-'}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al cargar deudores: ' + error.message);
+            }
+        }
+
         // Update UI
         function updateUI() {
             document.getElementById('totalCopropietarios').textContent = copropietarios.length;
             
-            // Update department select (sorted by block and department)
             const selectDepto = document.getElementById('selectDepartamento');
             const selectHistorial = document.getElementById('filtroHistorialCoprop');
+            const filtroBloque = document.getElementById('filtroDeudoresBloque');
             
             selectDepto.innerHTML = '<option value="">Seleccione un departamento</option>';
             selectHistorial.innerHTML = '<option value="">Todos</option>';
             
-            // Sort copropietarios by block and department
+            const bloques = new Set(copropietarios.map(c => c.bloque));
+            filtroBloque.innerHTML = '<option value="">Todos</option>' + 
+                Array.from(bloques).sort().map(b => `<option value="${b}">${b}</option>`).join('');
+            
             const sorted = [...copropietarios].sort((a, b) => {
                 if (a.bloque !== b.bloque) return a.bloque.localeCompare(b.bloque);
                 return a.departamento.localeCompare(b.departamento);
@@ -403,7 +723,6 @@
             renderCopropietarios();
         }
         
-        // Auto-fill name when department is selected
         document.getElementById('selectDepartamento').addEventListener('change', function() {
             const copropId = this.value;
             const nombreField = document.getElementById('nombreCompleto');
@@ -437,7 +756,6 @@
                 return;
             }
             
-            // Calculate statistics for each copropietario
             const copropietariosConStats = filtrados.map(c => {
                 const pagosCoprop = pagos.filter(p => p.copropietario_id === c.id);
                 const totalPagado = pagosCoprop.reduce((sum, p) => sum + parseFloat(p.monto), 0);
@@ -467,45 +785,23 @@
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Depto</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Contacto</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Total Pagado</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Consumo Agua</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Último Pago</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700"># Pagos</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         ${copropietariosConStats.map(c => `
                             <tr class="hover:bg-gray-50 transition">
-                                <td class="px-4 py-3">
-                                    <div class="font-semibold text-gray-800">${c.nombres}</div>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div class="font-semibold text-gray-800">${c.apellidos}</div>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div class="text-sm text-gray-600">${c.cedula}</div>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div class="font-bold text-indigo-600">${c.bloque}</div>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div class="font-bold text-indigo-600">${c.departamento}</div>
-                                </td>
+                                <td class="px-4 py-3 font-semibold text-gray-800">${c.nombres}</td>
+                                <td class="px-4 py-3 font-semibold text-gray-800">${c.apellidos}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">${c.cedula}</td>
+                                <td class="px-4 py-3 font-bold text-indigo-600">${c.bloque}</td>
+                                <td class="px-4 py-3 font-bold text-indigo-600">${c.departamento}</td>
                                 <td class="px-4 py-3 text-sm">
                                     ${c.telefono ? `<div class="text-gray-600">📱 ${c.telefono}</div>` : ''}
                                     ${c.email ? `<div class="text-gray-600 text-xs">📧 ${c.email}</div>` : ''}
                                     ${!c.telefono && !c.email ? '<span class="text-gray-400">-</span>' : ''}
                                 </td>
-                                <td class="px-4 py-3">
-                                    <span class="font-bold text-green-600">$${c.totalPagado.toFixed(2)}</span>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <span class="text-blue-600 font-semibold">${c.totalConsumoAgua > 0 ? `💧 ${c.totalConsumoAgua.toFixed(2)} m³` : '-'}</span>
-                                </td>
-                                <td class="px-4 py-3 text-sm">
-                                    ${c.ultimoPago ? `
-                                        <span class="text-gray-600">${c.ultimoPago.toLocaleDateString('es-EC')}</span>
-                                    ` : '<span class="text-gray-400">Sin pagos</span>'}
-                                </td>
+                                <td class="px-4 py-3 font-bold text-green-600">$${c.totalPagado.toFixed(2)}</td>
                                 <td class="px-4 py-3 text-center">
                                     <span class="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold">
                                         ${c.cantidadPagos}
@@ -546,7 +842,6 @@
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Copropietario</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Tipo</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Monto</th>
-                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Consumo</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Entidad</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Comprobante</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Periodo</th>
@@ -568,7 +863,6 @@
                                     <td class="px-4 py-3 text-sm font-medium">${coprop ? `${coprop.nombres} ${coprop.apellidos} (${coprop.bloque}-${coprop.departamento})` : 'N/A'}</td>
                                     <td class="px-4 py-3 text-sm">${tipoLabels[p.tipo]}</td>
                                     <td class="px-4 py-3 text-sm font-bold text-green-600">$${parseFloat(p.monto).toFixed(2)}</td>
-                                    <td class="px-4 py-3 text-sm">${p.consumo_agua ? `💧 ${p.consumo_agua} m³` : '-'}</td>
                                     <td class="px-4 py-3 text-sm text-gray-600">${p.entidad_bancaria || '-'}</td>
                                     <td class="px-4 py-3 text-sm text-gray-600">${p.numero_comprobante || '-'}</td>
                                     <td class="px-4 py-3 text-sm">${p.periodo ? new Date(p.periodo + '-01').toLocaleDateString('es-EC', {month: 'short', year: 'numeric'}) : 'N/A'}</td>
@@ -584,16 +878,18 @@
             const totalRecaudado = pagos.reduce((sum, p) => sum + parseFloat(p.monto), 0);
             const mesActual = new Date().toISOString().slice(0, 7);
             const pagosEsteMes = pagos.filter(p => p.fecha.startsWith(mesActual)).length;
-            const promedio = pagos.length > 0 ? totalRecaudado / pagos.length : 0;
+            const deudaTotal = expensas.filter(e => !e.pagado).reduce((sum, e) => sum + parseFloat(e.total), 0);
             
             document.getElementById('totalRecaudado').textContent = `$${totalRecaudado.toFixed(2)}`;
             document.getElementById('pagosEsteMes').textContent = pagosEsteMes;
-            document.getElementById('promedioPago').textContent = `$${promedio.toFixed(2)}`;
+            document.getElementById('deudaTotal').textContent = `$${deudaTotal.toFixed(2)}`;
             
             const resumen = document.getElementById('resumenCopropietarios');
             resumen.innerHTML = copropietarios.map(c => {
                 const pagosCoprop = pagos.filter(p => p.copropietario_id === c.id);
                 const totalPagado = pagosCoprop.reduce((sum, p) => sum + parseFloat(p.monto), 0);
+                const deudaCoprop = expensas.filter(e => e.copropietario_id === c.id && !e.pagado)
+                    .reduce((sum, e) => sum + parseFloat(e.total), 0);
                 const ultimoPago = pagosCoprop.length > 0 ? 
                     new Date(Math.max(...pagosCoprop.map(p => new Date(p.fecha)))).toLocaleDateString('es-EC') : 
                     'Sin pagos';
@@ -609,7 +905,7 @@
                             <div class="text-right">
                                 <div class="text-sm text-gray-500">Total Pagado</div>
                                 <div class="text-2xl font-bold text-green-600">$${totalPagado.toFixed(2)}</div>
-                                <div class="text-xs text-gray-500 mt-1">${pagosCoprop.length} pagos</div>
+                                ${deudaCoprop > 0 ? `<div class="text-sm text-red-600 font-semibold mt-1">Debe: $${deudaCoprop.toFixed(2)}</div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -626,6 +922,8 @@
         // Tab button event listeners
         document.getElementById('tab-registro').addEventListener('click', () => showTab('registro'));
         document.getElementById('tab-copropietarios').addEventListener('click', () => showTab('copropietarios'));
+        document.getElementById('tab-gestion').addEventListener('click', () => showTab('gestion'));
+        document.getElementById('tab-deudores').addEventListener('click', () => showTab('deudores'));
         document.getElementById('tab-historial').addEventListener('click', () => showTab('historial'));
         document.getElementById('tab-resumen').addEventListener('click', () => showTab('resumen'));
 
@@ -640,8 +938,12 @@
             }
         });
 
-        // Set default date
+        // Set default dates
         document.getElementById('fechaPago').valueAsDate = new Date();
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        document.getElementById('periodo').value = currentMonth;
+        document.getElementById('periodoExpensas').value = currentMonth;
+        document.getElementById('periodoAgua').value = currentMonth;
 
         // Load data on start
         loadData();
