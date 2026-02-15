@@ -431,11 +431,18 @@
                             <input type="number" id="ccGarantia" step="0.01" value="20.00" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Método de Pago *</label>
-                            <select id="ccMetodoPago" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                                <option value="efectivo">Efectivo</option>
-                                <option value="transferencia">Transferencia</option>
-                                <option value="cheque">Cheque</option>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Entidad Bancaria *</label>
+                            <select id="ccEntidadBancaria" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                                <option value="">Seleccione una entidad</option>
+                                <option value="Banco Pichincha">Banco Pichincha</option>
+                                <option value="Produbanco">Produbanco</option>
+                                <option value="Coop. 29 de Octubre">Coop. 29 de Octubre</option>
+                                <option value="Banco General Rumiñahui">Banco General Rumiñahui</option>
+                                <option value="Banco Internacional">Banco Internacional</option>
+                                <option value="Banco Guayaquil">Banco Guayaquil</option>
+                                <option value="Banco Bolivariano">Banco Bolivariano</option>
+                                <option value="Banco Pacífico">Banco Pacífico</option>
+                                <option value="Efectivo">Efectivo</option>
                             </select>
                         </div>
                         <div>
@@ -860,18 +867,22 @@
                 return;
             }
             
+            const montoPago = parseFloat(document.getElementById('monto').value);
+            const periodo = document.getElementById('periodo').value;
+            
             const nuevoPago = {
                 copropietario_id: copropietarioId,
                 tipo: document.getElementById('tipoPago').value,
-                monto: parseFloat(document.getElementById('monto').value),
+                monto: montoPago,
                 fecha: document.getElementById('fechaPago').value,
                 entidad_bancaria: document.getElementById('entidadBancaria').value || null,
                 numero_comprobante: document.getElementById('numeroComprobante').value || null,
-                periodo: document.getElementById('periodo').value,
+                periodo: periodo,
                 observaciones: document.getElementById('observaciones').value || null
             };
             
             try {
+                // Insertar el pago
                 const { data, error } = await supabase
                     .from('pagos')
                     .insert([nuevoPago])
@@ -879,16 +890,60 @@
                 
                 if (error) throw error;
                 
-                // Marcar expensa como pagada si aplica
-                if (nuevoPago.tipo === 'alicuota' || nuevoPago.tipo === 'agua') {
-                    await marcarExpensaPagada(copropietarioId, nuevoPago.periodo);
+                // Calcular saldo a favor si hay exceso
+                if (nuevoPago.tipo === 'alicuota' || nuevoPago.tipo === 'agua' || nuevoPago.tipo === 'casa_comunal') {
+                    // Obtener la expensa del periodo
+                    const { data: expensaData, error: expensaError } = await supabase
+                        .from('expensas_mensuales')
+                        .select('total, pagado')
+                        .eq('copropietario_id', copropietarioId)
+                        .eq('periodo', periodo)
+                        .single();
+                    
+                    if (expensaData && !expensaError) {
+                        const deuda = parseFloat(expensaData.total);
+                        
+                        if (montoPago >= deuda) {
+                            // Pago cubre la deuda completa
+                            await marcarExpensaPagada(copropietarioId, periodo);
+                            
+                            // Hay exceso?
+                            const exceso = montoPago - deuda;
+                            if (exceso > 0) {
+                                // Agregar al saldo a favor
+                                const { data: copropData } = await supabase
+                                    .from('copropietarios')
+                                    .select('saldo_favor')
+                                    .eq('id', copropietarioId)
+                                    .single();
+                                
+                                const saldoActual = parseFloat(copropData?.saldo_favor || 0);
+                                const nuevoSaldo = saldoActual + exceso;
+                                
+                                await supabase
+                                    .from('copropietarios')
+                                    .update({ saldo_favor: nuevoSaldo })
+                                    .eq('id', copropietarioId);
+                                
+                                alert(`✅ Pago registrado exitosamente\n\n💰 Exceso de $${exceso.toFixed(2)} agregado a saldo a favor\nNuevo saldo a favor: $${nuevoSaldo.toFixed(2)}`);
+                            } else {
+                                alert('✅ Pago registrado exitosamente');
+                            }
+                        } else {
+                            // Pago parcial
+                            alert(`✅ Pago parcial registrado\n\nDeuda original: $${deuda.toFixed(2)}\nPagado: $${montoPago.toFixed(2)}\nPendiente: $${(deuda - montoPago).toFixed(2)}`);
+                        }
+                    } else {
+                        alert('✅ Pago registrado exitosamente');
+                    }
+                } else {
+                    alert('✅ Pago registrado exitosamente');
                 }
                 
                 e.target.reset();
                 document.getElementById('nombreCompleto').value = '';
                 deptoInput.dataset.copropId = '';
                 await loadData();
-                alert('✅ Pago registrado exitosamente');
             } catch (error) {
                 console.error('Error:', error);
                 alert('❌ Error al registrar pago: ' + error.message);
@@ -1329,12 +1384,15 @@
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Depto</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Contacto</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Total Pagado</th>
+                            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Saldo a Favor</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700"># Pagos</th>
                             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        ${copropietariosConStats.map(c => `
+                        ${copropietariosConStats.map(c => {
+                            const saldoFavor = parseFloat(c.saldo_favor || 0);
+                            return `
                             <tr class="hover:bg-gray-50 transition">
                                 <td class="px-4 py-3 font-semibold text-gray-800">${c.nombres}</td>
                                 <td class="px-4 py-3 font-semibold text-gray-800">${c.apellidos}</td>
@@ -1347,18 +1405,29 @@
                                     ${!c.telefono && !c.email ? '<span class="text-gray-400">-</span>' : ''}
                                 </td>
                                 <td class="px-4 py-3 font-bold text-green-600">$${c.totalPagado.toFixed(2)}</td>
+                                <td class="px-4 py-3">
+                                    ${saldoFavor > 0 ? 
+                                        `<span class="font-bold text-blue-600">+$${saldoFavor.toFixed(2)}</span>` : 
+                                        '<span class="text-gray-400">$0.00</span>'}
+                                </td>
                                 <td class="px-4 py-3 text-center">
                                     <span class="inline-block bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold">
                                         ${c.cantidadPagos}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <button onclick='abrirModalEditar(${JSON.stringify(c)})' class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                                        ✏️ Editar
-                                    </button>
+                                    <div class="flex gap-2">
+                                        <button onclick='abrirModalEditar(${JSON.stringify(c)})' class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                                            ✏️ Editar
+                                        </button>
+                                        <button onclick='eliminarCopropietario("${c.id}", "${c.nombres} ${c.apellidos}")' class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                            🗑️ Eliminar
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
-                        `).join('')}
+                        `;
+                        }).join('')}
                     </tbody>
                 </table>
             `;
@@ -1444,6 +1513,7 @@
                 const ultimoPago = pagosCoprop.length > 0 ? 
                     new Date(Math.max(...pagosCoprop.map(p => new Date(p.fecha)))).toLocaleDateString('es-EC') : 
                     'Sin pagos';
+                const saldoFavor = parseFloat(c.saldo_favor || 0);
                 
                 return `
                     <div class="border border-gray-200 rounded-lg p-4 mb-4 hover:shadow-md transition">
@@ -1452,11 +1522,13 @@
                                 <div class="font-bold text-lg">${c.nombres} ${c.apellidos}</div>
                                 <div class="text-sm text-gray-600">🏠 Bloque ${c.bloque} - Depto ${c.departamento}</div>
                                 <div class="text-sm text-gray-500 mt-1">Último pago: ${ultimoPago}</div>
+                                ${saldoFavor > 0 ? `<div class="text-sm text-blue-600 font-semibold mt-1">💰 Saldo a favor: +$${saldoFavor.toFixed(2)}</div>` : ''}
                             </div>
                             <div class="text-right">
                                 <div class="text-sm text-gray-500">Total Pagado</div>
                                 <div class="text-2xl font-bold text-green-600">$${totalPagado.toFixed(2)}</div>
                                 ${deudaCoprop > 0 ? `<div class="text-sm text-red-600 font-semibold mt-1">Debe: $${deudaCoprop.toFixed(2)}</div>` : ''}
+                                ${saldoFavor > 0 && deudaCoprop > 0 ? `<div class="text-xs text-gray-500 mt-1">(Saldo se aplicará automáticamente)</div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -1506,6 +1578,28 @@
 
         window.cerrarModalEditar = function() {
             document.getElementById('modalEditarCoprop').classList.add('hidden');
+        }
+
+        // Delete copropietario
+        window.eliminarCopropietario = async function(id, nombre) {
+            if (!confirm(`⚠️ ¿Estás seguro de eliminar a ${nombre}?\n\nEsto eliminará:\n- Todos sus pagos\n- Sus expensas\n- Sus arrendamientos\n\nEsta acción NO se puede deshacer.`)) {
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('copropietarios')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                await loadData();
+                alert('✅ Copropietario eliminado exitosamente');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al eliminar: ' + error.message);
+            }
         }
 
         // Edit copropietario form submission
@@ -1621,7 +1715,7 @@
                 monto_alquiler: montoAlquiler,
                 monto_garantia: garantia,
                 monto_total: montoAlquiler + garantia,
-                metodo_pago: document.getElementById('ccMetodoPago').value,
+                entidad_bancaria: document.getElementById('ccEntidadBancaria').value,
                 numero_comprobante: document.getElementById('ccComprobante').value || null,
                 observaciones: document.getElementById('ccObservaciones').value || null,
                 estado: 'pendiente'
