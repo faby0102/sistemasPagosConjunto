@@ -1,0 +1,60 @@
+```
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Build outputs (if any JS/TS build process generates these)
+dist/
+build/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# Coverage reports
+coverage/
+htmlcov/
+
+# Python cache (if Python files were part of the project)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Compressed archives
+*.zip
+*.tar.gz
+*.tgz
+*.tar.bz2
+*.tar.xz
+*.rar
+*.7z
+*.gz
+*.bz2
+*.xz
+*.Z
+*.lz
+*.lzo
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+
+```
